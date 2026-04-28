@@ -5,12 +5,14 @@
 #
 # ------------------------------------------------------------------
 
-from utils.axomessagebox import AxoMessageBox
-from utils.axoloadingscreen import AxoLoadingScreen
+from utils import utils
 
 import customtkinter
 import os
 import pyglet
+import subprocess
+import json
+import requests
 import sys
 import ctypes
 
@@ -24,18 +26,22 @@ try:
             file.write("-------- DO NOT TOUCH THIS FILE --------\ndefaultuser0")
     except FileExistsError:
         pass
-    AxoMessageBox("AxoOS", "Seems like it's the first time you're using AxoOS...\nwelcome on AxoOS!\nAxoOS is a \"fake\" operating system\nwritten fully in Python (only availabe on Windows 10/11)", "information", 18)
+    try:
+        try:
+            with open(f"C:/Users/{os.getlogin()}/AxoOS/User Data/version.axo", "x") as file:
+                headers = {'Accept': 'application/json'}
+                r = requests.get('https://raw.githubusercontent.com/dudulecode/AxoOS/refs/heads/main/update.json', headers=headers)
+                r_json = r.json()
+                r_str = json.dumps(r_json)
+                r_resp = json.loads(r_str)
+                file.write(r_resp['current_version'])
+        except FileExistsError:
+            pass
+    except FileExistsError:
+        pass
+    utils.AxoMessageBox("AxoOS", "Seems like it's the first time you're using AxoOS...\nwelcome on AxoOS!\nAxoOS is a \"fake\" operating system\nwritten fully in Python (only availabe on Windows 10/11)", "information", 18)
 except FileExistsError:
     pass
 
-AxoLoadingScreen("Loading...")
-
-boot = customtkinter.CTk()
-boot.title("AxoOS")
-# boot.geometry("1600x1200")
-boot.iconbitmap(f'{path_}/resources/blue.ico')
-
-
-
-boot.after(0, lambda:boot.state('zoomed'))
-boot.mainloop()
+utils.AxoLoadingScreen("Loading...", 2000)
+utils.AxoUpdate()
